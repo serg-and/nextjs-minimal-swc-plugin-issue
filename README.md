@@ -1,40 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+Minimal reproduction of issue with next SWC plugin runner.
 
-## Getting Started
+Next's pluggin runner no longer provides the known file path to the metadata for a SWC plugin, only providing the file name.
 
-First, run the development server:
+This is conflict with SWC, saying: [swc docs](https://rustdoc.swc.rs/swc_common/plugin/metadata/struct.TransformPluginMetadataContext.html#structfield.filename)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```rust
+/// Host side metadata context plugin may need to access.
+/// This is a global context - any plugin in single transform will have same
+/// values.
+pub struct TransformPluginMetadataContext {
+    /// The path of the file being processed. This includes all of the path as
+    /// much as possible.
+    pub filename: Option<String>,
+
+    ...
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This breaks several packages such as [next-superjson-plugin](https://github.com/blitz-js/next-superjson-plugin) which rely on the path to determine whether some files are page or app router based.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+I believe the issue originates from here https://github.com/vercel/next.js/blob/v15.0.1/turbopack/crates/turbopack-ecmascript-plugins/src/transform/swc_ecma_transform_plugins.rs#L189
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+`Some(ctx.file_name_str.to_string())` could simply be changed to `Some(ctx.file_path_str.to_string())`
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Example
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Simple SWC plugin that logs the metadata filename of the transformed file, shows that only the filename is provided.
 
-## Learn More
+## Run
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+```sh
+npm i
+cd swc_plugin
+npm run prepublish
+cd ..
+npm run dev
+```

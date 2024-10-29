@@ -1,0 +1,15 @@
+{
+    "name": "swc_plugin",
+    "version": "0.1.0",
+    "description": "",
+    "author": "",
+    "license": "ISC",
+    "keywords": ["swc-plugin"],
+    "type": "module",
+    "main": "./dist/swc_plugin.wasm",
+    "scripts": {
+        "prepublish": "cargo build-wasi --release && cp target/wasm32-wasi/release/swc_plugin.wasm ./dist"
+    },
+    "files": [],
+    "preferUnplugged": true
+}

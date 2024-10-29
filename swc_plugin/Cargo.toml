@@ -1,0 +1,15 @@
+[package]
+name = "swc_plugin"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+
+[dependencies]
+serde = "1"
+# match swc_core version of next.js@15.0.1
+swc_core = { version = "0.106.*", features = ["ecma_plugin_transform"] }
