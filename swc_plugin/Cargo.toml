@@ -11,5 +11,5 @@ lto = true
 
 [dependencies]
 serde = "1"
-# match swc_core version of next.js@15.0.1
-swc_core = { version = "0.106.*", features = ["ecma_plugin_transform"] }
+# match swc_core version of next.js@15.4.4
+swc_core = { version = "26.4.5", features = ["ecma_plugin_transform"] }

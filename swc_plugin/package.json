@@ -4,11 +4,13 @@
     "description": "",
     "author": "",
     "license": "ISC",
-    "keywords": ["swc-plugin"],
+    "keywords": [
+        "swc-plugin"
+    ],
     "type": "module",
     "main": "./dist/swc_plugin.wasm",
     "scripts": {
-        "prepublish": "cargo build-wasi --release && cp target/wasm32-wasi/release/swc_plugin.wasm ./dist"
+        "prepublish": "cargo build-wasi --release && cp target/wasm32-wasip1/release/swc_plugin.wasm ./dist"
     },
     "files": [],
     "preferUnplugged": true
